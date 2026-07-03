@@ -1,41 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:savicam_relap/core/env/env_config.dart';
-import 'package:savicam_relap/core/services/supabase_service.dart';
-import 'package:savicam_relap/ui/screens/pairing_screen.dart';
-import 'package:savicam_relap/ui/widgets/global_alert_overlay.dart';
 
-void main() async {
+import 'core/constants/app_strings.dart';
+import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
+import 'data/services/supabase_service.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Environment variables
-  await EnvConfig.loadEnv();
-  
-  // Initialize Supabase
-  await SupabaseService().initialize();
+  await dotenv.load(fileName: ".env");
+  await SupabaseService.initialize();
 
-  runApp(
-    const ProviderScope(
-      child: SaViCamApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: SaViCamRelapApp()));
 }
 
-class SaViCamApp extends StatelessWidget {
-  const SaViCamApp({super.key});
+class SaViCamRelapApp extends StatelessWidget {
+  const SaViCamRelapApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GlobalAlertOverlay(
-      child: MaterialApp(
-        title: 'SaViCam Relap',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
-        home: const PairingScreen(),
-      ),
+    return MaterialApp(
+      title: AppStrings.appName,
+      debugShowCheckedModeBanner: false,
+      theme: buildAppTheme(),
+      home: const AppBootstrap(),
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:savicam_relap/app.dart';
+import 'package:savicam_relap/main.dart';
 
 void main() {
   testWidgets('renders the companion app shell', (WidgetTester tester) async {
