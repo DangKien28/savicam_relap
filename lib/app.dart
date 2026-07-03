@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'core/config/app_config.dart';
+import 'core/env/env_config.dart';
 import 'core/theme/app_theme.dart';
 import 'features/home/presentation/home_shell.dart';
 
@@ -9,14 +9,14 @@ class AppBootstrap {
   const AppBootstrap._();
 
   static Future<void> initialize() async {
-    if (!AppConfig.hasSupabaseConfig) {
+    if (EnvConfig.supabaseUrl.isEmpty || EnvConfig.supabaseAnonKey.isEmpty) {
       return;
     }
 
     try {
       await Supabase.initialize(
-        url: AppConfig.supabaseUrl,
-        publishableKey: AppConfig.supabaseAnonKey,
+        url: EnvConfig.supabaseUrl,
+        anonKey: EnvConfig.supabaseAnonKey,
       );
     } catch (error) {
       debugPrint('Supabase initialization skipped: $error');

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:savicam_relap/ui/screens/dashboard_screen.dart';
-import 'package:savicam_relap/ui/screens/telemetry_screen.dart';
-import 'package:savicam_relap/ui/screens/user_macros_screen.dart';
+import '../../views/map_view.dart';
+import '../../views/device_list_view.dart';
+import '../../views/dictionary_view.dart';
+import '../../views/settings_view.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -13,35 +14,26 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    DashboardScreen(),
-    TelemetryScreen(),
-    UserMacrosScreen(),
+  final List<Widget> _pages = [
+    const MapView(),
+    const DictionaryView(),
+    const DeviceListView(),
+    const SettingsView(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Bản đồ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.monitor_heart),
-            label: 'Viễn trắc',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Từ điển',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Bản đồ'),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Từ điển'),
+          BottomNavigationBarItem(icon: Icon(Icons.devices), label: 'Thiết bị'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Cài đặt'),
         ],
       ),
     );

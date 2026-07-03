@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:savicam_relap/core/services/supabase_service.dart';
 import 'package:savicam_relap/features/alerts/emergency_alert_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RedAlertScreen extends ConsumerWidget {
   final EmergencyAlert alert;
@@ -87,7 +88,7 @@ class RedAlertScreen extends ConsumerWidget {
               TextButton(
                 onPressed: () async {
                   // Đổi status thành 'resolved' để tắt báo động
-                  await SupabaseService().client
+                  await Supabase.instance.client
                       .from('emergency_alerts')
                       .update({'status': 'resolved'})
                       .eq('id', alert.id);

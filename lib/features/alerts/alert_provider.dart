@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:savicam_relap/core/services/supabase_service.dart';
 import 'package:savicam_relap/features/alerts/emergency_alert_model.dart';
 import 'package:savicam_relap/features/telemetry/telemetry_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final alertStreamProvider = StreamProvider<EmergencyAlert?>((ref) {
   final pairedDeviceId = ref.watch(currentPairedDeviceIdProvider);
@@ -10,7 +11,7 @@ final alertStreamProvider = StreamProvider<EmergencyAlert?>((ref) {
   }
 
   // Lắng nghe realtime từ bảng emergency_alerts
-  return SupabaseService().client
+  return Supabase.instance.client
       .from('emergency_alerts')
       .stream(primaryKey: ['id'])
       .eq('paired_device_id', pairedDeviceId)

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:savicam_relap/core/services/supabase_service.dart';
 import 'package:savicam_relap/features/telemetry/device_telemetry_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Assuming we have a paired device ID in context, for now we will hardcode or require it.
 // In a real app, this would come from a user session provider.
@@ -12,7 +13,7 @@ final telemetryStreamProvider = StreamProvider<DeviceTelemetry?>((ref) {
     return Stream.value(null);
   }
 
-  return SupabaseService().client
+  return Supabase.instance.client
       .from('device_telemetry')
       .stream(primaryKey: ['tmod_device_id'])
       .eq('paired_device_id', pairedDeviceId)

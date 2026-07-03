@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:savicam_relap/core/services/supabase_service.dart';
 import 'package:savicam_relap/features/telemetry/telemetry_provider.dart';
 import 'package:savicam_relap/ui/screens/main_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PairingScreen extends ConsumerStatefulWidget {
   const PairingScreen({super.key});
@@ -22,8 +23,8 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 1. Kiểm tra xem code có tồn tại và hợp lệ không
-      final response = await SupabaseService().client
+      // 1. Kiểm tra xem code có tồn tại và đang ở trạng thái chờ không
+      final response = await Supabase.instance.client
           .from('device_pairs')
           .select()
           .eq('pairing_code', code)
@@ -31,13 +32,21 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
           .maybeSingle();
 
       if (response != null) {
-        // 2. Cập nhật status thành active
-        await SupabaseService().client
+        // Lấy ID của người dùng Relap hiện tại từ Supabase Auth
+        // (Nếu bạn chưa làm luồng Login, mình gán tạm một UUID hợp lệ chuẩn để bypass Database)
+        final String relapUserId = Supabase.instance.client.auth.currentUser?.id 
+            ?? '11111111-1111-1111-1111-111111111111';
+
+        // 2. Cập nhật status thành 'paired' cho khớp Constraint
+        await Supabase.instance.client
             .from('device_pairs')
-            .update({'status': 'active', 'relap_user_id': 'current_user_id'}) // Mock user id
+            .update({
+              'status': 'paired', 
+              'relap_user_id': relapUserId
+            }) 
             .eq('id', response['id']);
 
-        // 3. Set paired device id vào state
+        // 3. Set paired device id vào state của Riverpod
         ref.read(currentPairedDeviceIdProvider.notifier).state = response['id'];
 
         if (mounted) {
@@ -52,7 +61,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mã ghép nối không hợp lệ hoặc đã hết hạn.')),
+            const SnackBar(content: Text('Mã ghép nối không hợp lệ hoặc đã được sử dụng.')),
           );
         }
       }
@@ -89,7 +98,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
             const SizedBox(height: 24),
             TextField(
               controller: _codeController,
-              keyboardType: TextInputType.text,
+              keyboardType: TextInputType.number, // Tối ưu bàn phím số
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 24, letterSpacing: 8),
               decoration: InputDecoration(

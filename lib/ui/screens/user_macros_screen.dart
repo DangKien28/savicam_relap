@@ -4,13 +4,14 @@ import 'package:savicam_relap/core/services/supabase_service.dart';
 import 'package:savicam_relap/features/macros/user_macro_model.dart';
 import 'package:savicam_relap/features/telemetry/telemetry_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Đơn giản hóa state provider để lấy danh sách macros.
 final macrosStreamProvider = StreamProvider.autoDispose<List<UserMacro>>((ref) {
   final pairedDeviceId = ref.watch(currentPairedDeviceIdProvider);
   if (pairedDeviceId == null) return Stream.value([]);
 
-  return SupabaseService().client
+  return Supabase.instance.client
       .from('user_macros')
       .stream(primaryKey: ['id'])
       .eq('paired_device_id', pairedDeviceId)
@@ -45,7 +46,7 @@ class UserMacrosScreen extends ConsumerWidget {
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () async {
-                    await SupabaseService().client
+                    await Supabase.instance.client
                         .from('user_macros')
                         .delete()
                         .eq('id', macro.id);
@@ -136,7 +137,7 @@ class UserMacrosScreen extends ConsumerWidget {
                   createdAt: DateTime.now(),
                 );
 
-                await SupabaseService().client
+                await Supabase.instance.client
                     .from('user_macros')
                     .insert(newMacro.toJson());
 
